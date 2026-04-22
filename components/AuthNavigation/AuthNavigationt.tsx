@@ -35,7 +35,7 @@ export default function AuthNavigation() {
         <>
           <li className={css.navigationItem}>
             <Link
-              href="/app/sing-in"
+              href="/sing-in"
               prefetch={false}
               className={css.navigationLink}
             >
