@@ -19,7 +19,7 @@ export default function SingIn() {
     try {
       const user = await login({ email, password });
       setUser(user);
-      router.push("./profile");
+      router.push("/profile");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Login error");

@@ -1,15 +1,24 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isLoggedIn = false; // тут буде перевірка cookie
+  const router = useRouter();
 
-  if (isLoggedIn) {
-    redirect("/profile");
-  }
+  const isLoggedIn = false;
+
+  useEffect(() => {
+    router.refresh();
+
+    if (isLoggedIn) {
+      router.push("/profile");
+    }
+  }, [isLoggedIn, router]);
 
   return <>{children}</>;
 }

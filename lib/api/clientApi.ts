@@ -4,8 +4,8 @@ import type { User, RegisterRequest } from "@/types/user";
 import type { LoginRequest } from "@/types/login";
 import type { CheckSessionRequest } from "@/types/checkSession";
 import { api } from "./api";
-const myKey = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN
-const BASE_URL = "https://notehub-api.goit.study/docs";
+import type { UserUpDate } from "@/types/user";
+
 
 
 
@@ -18,7 +18,7 @@ const BASE_URL = "https://notehub-api.goit.study/docs";
 
 
 export async function fetchNotes(searchText?: string, page?: number , perPage?: number , tag? : string ): Promise<FetchNotesProps>{
-    const response = await axios.get<FetchNotesProps>("/notes", {
+    const response = await api.get<FetchNotesProps>("/notes", {
         params: {
             search: searchText,
             page,
@@ -26,7 +26,7 @@ export async function fetchNotes(searchText?: string, page?: number , perPage?: 
             tag
         },
         headers: {
-            // Authorization: `Bearer ${myKey}`,
+        
              accept: "application/json",
             
         }
@@ -42,9 +42,9 @@ interface CreateNoteProps {
 }
 
 export async  function createNote(newPost: CreateNoteProps): Promise<Note> {
-    const createNewNote = await axios.post<Note> ("/notes", newPost,    {
+    const createNewNote = await api.post<Note> ("/notes", newPost,    {
       headers: {
-        // Authorization: `Bearer ${myKey}`,
+     
         accept: "application/json",
       },
     })
@@ -52,9 +52,9 @@ export async  function createNote(newPost: CreateNoteProps): Promise<Note> {
 }
 
 export async function deleteNote(noteId : string, ) : Promise<Note> {
-    const deleteNote = await axios.delete<Note>(`/notes/${noteId}`, {
+    const deleteNote = await api.delete<Note>(`/notes/${noteId}`, {
         headers: {
-            // Authorization: `Bearer ${myKey}`,
+
             accept: "application/json",
         }
     });
@@ -62,11 +62,8 @@ export async function deleteNote(noteId : string, ) : Promise<Note> {
 }
 
 export async function fetchNoteById(id : string) : Promise<Note> {
-    const { data } = await axios.get<Note>(`notes/${id}`,
-        // {
-        //     headers: {
-        // Authorization: `Bearer ${myKey}`},
-        // },
+    const { data } = await api.get<Note>(`/notes/${id}`,
+      
     );
   return data;
 }
@@ -78,7 +75,7 @@ export async function register(data :RegisterRequest) {
 }
 
 export async function login(data: LoginRequest) {
-    const response = await api.post<User>('/uth/login', data);
+    const response = await api.post<User>('/auth/login', data);
     return response.data;
 }
 
@@ -88,7 +85,7 @@ export async function logout(): Promise<void> {
 
 export async function checkSession() {
     const response = await api.get<CheckSessionRequest>('/auth/session');
-    return response.data.success
+    return response.data
 }
 
 export async  function getMe(): Promise<User> {
@@ -96,8 +93,8 @@ export async  function getMe(): Promise<User> {
     return response.data
 }
 
-export async function updateMe(data : User): Promise<User> {
-    const response = await api.patch<User>('/user/me', data);
+export async function updateMe(data :  UserUpDate): Promise<User> {
+    const response = await api.patch<User>('/users/me', data);
 
     return response.data;
 }

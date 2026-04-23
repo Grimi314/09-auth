@@ -5,9 +5,12 @@ import { register } from "@/lib/api/clientApi";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
+import { useAuthStore } from "@/lib/store/authStore";
 
 export default function SingUp() {
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
+
   const [error, setError] = useState<string | null>(null);
 
   async function handlesubmit(formData: FormData) {
@@ -15,7 +18,10 @@ export default function SingUp() {
     const password = formData.get("password") as string;
 
     try {
-      await register({ email, password });
+      const user = await register({ email, password });
+
+      setUser(user);
+
       router.push("/profile");
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -31,6 +37,7 @@ export default function SingUp() {
   return (
     <main className={css.mainContent}>
       <h1 className={css.formTitle}>Sign up</h1>
+
       <form className={css.form} action={handlesubmit}>
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>

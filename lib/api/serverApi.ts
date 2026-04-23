@@ -5,6 +5,7 @@ import type { CheckSessionRequest } from "@/types/checkSession";
 import type { User } from "@/types/user";
 import type { Note } from "@/types/note";
 
+
 async function getHeaders() {
   const cookieStore = await cookies();
 
@@ -56,5 +57,21 @@ export async function checkSession() {
     const response = await api.get<CheckSessionRequest>('/auth/session', {
     headers: await getHeaders(),
   });
-    return response.data.success
+    return response.data
+}
+
+
+
+
+
+export async function refreshSession(refreshToken: string) {
+  try {
+    const response = await api.post("/auth/session", {
+      refreshToken,
+    });
+
+    return response.data;
+  } catch (error) {
+   console.log(error)
+  }
 }

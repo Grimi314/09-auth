@@ -1,29 +1,27 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import css from "./EditProfilePage.module.css";
 import { User } from "@/types/user";
-import { api } from "@/lib/api/api";
+import { getMe, updateMe } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
 
-export default function EdipProfile() {
+export default function EditProfile() {
   const [user, setUser] = useState<null | User>(null);
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
+
   const router = useRouter();
+  const setAuthUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await api.get("users/me", {
-          params: {
-            credentials: "include",
-          },
-        });
-
-        const data = res.data;
+        const data = await getMe();
         setUser(data);
-        setUsername(data.userName);
+        setUsername(data?.username ?? "");
       } catch (error) {
         console.error(error);
       } finally {
@@ -34,15 +32,17 @@ export default function EdipProfile() {
     fetchUser();
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (formData: FormData) => {
     try {
-      const res = await api.patch("/users/me", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ username }),
+      const username = formData.get("username") as string;
+
+      const updatedUser = await updateMe({
+        username: username,
       });
+
+      setUser(updatedUser);
+
+      setAuthUser(updatedUser);
 
       router.push("/profile");
     } catch (error) {
@@ -63,7 +63,7 @@ export default function EdipProfile() {
         <h1 className={css.formTitle}>Edit Profile</h1>
 
         <Image
-          src={user.photoUrl ?? ""}
+          src={user.avatar ?? ""}
           alt="User Avatar"
           width={120}
           height={120}
@@ -75,6 +75,7 @@ export default function EdipProfile() {
             <label htmlFor="username">Username:</label>
             <input
               id="username"
+              name="username"
               type="text"
               className={css.input}
               value={username}
@@ -88,6 +89,7 @@ export default function EdipProfile() {
             <button type="submit" className={css.saveButton}>
               Save
             </button>
+
             <button
               type="button"
               className={css.cancelButton}
