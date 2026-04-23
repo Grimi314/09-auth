@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { api } from "./api";
 import type { CheckSessionRequest } from "@/types/checkSession";
-import type { User } from "@/types/register";
+import type { User } from "@/types/user";
 import type { Note } from "@/types/note";
 
 async function getHeaders() {

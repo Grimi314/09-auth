@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import css from "./EditProfilePage.module.css";
-import { User } from "@/types/register";
+import { User } from "@/types/user";
 import { api } from "@/lib/api/api";
 
 export default function EdipProfile() {

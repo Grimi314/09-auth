@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { Note } from "../../types/note";
-import type { User, RegisterRequest } from "@/types/register";
+import type { User, RegisterRequest } from "@/types/user";
 import type { LoginRequest } from "@/types/login";
 import type { CheckSessionRequest } from "@/types/checkSession";
 import { api } from "./api";
