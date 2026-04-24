@@ -1,10 +1,10 @@
-import axios from "axios";
+
 import type { Note } from "../../types/note";
 import type { User, RegisterRequest } from "@/types/user";
 import type { LoginRequest } from "@/types/login";
 import type { CheckSessionRequest } from "@/types/checkSession";
 import { api } from "./api";
-import type { UserUpDate } from "@/types/user";
+import type { UserUpdate } from "@/types/user";
 
 
 
@@ -93,7 +93,7 @@ export async  function getMe(): Promise<User> {
     return response.data
 }
 
-export async function updateMe(data :  UserUpDate): Promise<User> {
+export async function updateMe(data :  UserUpdate): Promise<User> {
     const response = await api.patch<User>('/users/me', data);
 
     return response.data;
