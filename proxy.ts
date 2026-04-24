@@ -4,7 +4,7 @@ import { refreshSession } from "@/lib/api/serverApi";
 
 
 const PUBLIC_ROUTES = ["/sign-in", "/sign-up"];
-const PRIVATE_ROUTES = ["/profile", "/notes"];
+const PRIVATE_ROUTES =  ["/notes", "/profile"];;
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,13 +12,13 @@ export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
 
-  const isPublic = PUBLIC_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isPrivate = PRIVATE_ROUTES.some((route) =>
+const isPublic = PUBLIC_ROUTES.some((route) =>
     pathname.startsWith(route)
   );
 
+  const isPrivate = PRIVATE_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
   let newAccessToken = accessToken;
 
 
@@ -72,5 +72,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/profile/edit", "/notes", "/sign-in", "/sign-up"],
+  matcher: ["/profile/:path*", "/notes/:path*", "/sign-in", "/sign-up"]
 };
