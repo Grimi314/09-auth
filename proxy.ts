@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { refreshSession } from "@/lib/api/serverApi";
 
+
+
 const PUBLIC_ROUTES = ["/sign-in", "/sign-up"];
 const PRIVATE_ROUTES = ["/profile", "/notes"];
 
@@ -70,5 +72,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/profile", "/notes/:path*", "/sign-in", "/sign-up"],
+  matcher: ["/profile/edit", "/notes", "/sign-in", "/sign-up"],
 };

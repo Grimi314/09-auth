@@ -1,13 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import css from "./AuthNavigation.module.css";
 import { useAuthStore } from "@/lib/store/authStore";
 import { useLogout } from "@/app/hooks/useLogout";
 
 export default function AuthNavigation() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout: clearAuth } = useAuthStore();
   const { mutate: logout } = useLogout();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        clearAuth();
+        router.push("/sign-in");
+      },
+    });
+  };
 
   return (
     <>
@@ -26,7 +37,7 @@ export default function AuthNavigation() {
           <li className={css.navigationItem}>
             <p className={css.userEmail}>{user?.email}</p>
 
-            <button onClick={() => logout()} className={css.logoutButton}>
+            <button onClick={handleLogout} className={css.logoutButton}>
               Logout
             </button>
           </li>
@@ -35,7 +46,7 @@ export default function AuthNavigation() {
         <>
           <li className={css.navigationItem}>
             <Link
-              href="/sing-in"
+              href="/sign-in"
               prefetch={false}
               className={css.navigationLink}
             >
@@ -45,7 +56,7 @@ export default function AuthNavigation() {
 
           <li className={css.navigationItem}>
             <Link
-              href="/sing-up"
+              href="/sign-up"
               prefetch={false}
               className={css.navigationLink}
             >
