@@ -47,6 +47,16 @@ export async function fetchNoteById(id: string): Promise<Note> {
   return response.data;
 }
 
+export async function checkSession(): Promise<
+  AxiosResponse<CheckSessionResponse>
+> {
+  const response = await api.get<CheckSessionResponse>("/auth/session", {
+    headers: await getHeaders(),
+  });
+
+  return response;
+}
+
 export async function getMe(): Promise<User> {
   const response = await api.get<User>("/users/me", {
     headers: await getHeaders(),
@@ -58,12 +68,4 @@ export async function getMe(): Promise<User> {
 
 
 
-export async function checkSession(): Promise<
-  AxiosResponse<CheckSessionResponse>
-> {
-  const response = await api.get<CheckSessionResponse>("/auth/session", {
-    headers: await getHeaders(),
-  });
 
-  return response;
-}
