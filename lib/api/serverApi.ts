@@ -1,7 +1,7 @@
 
 import { cookies } from "next/headers";
 import { api } from "./api";
-import type { CheckSessionResponse } from "@/types/checkSession";
+import type { CheckSessionRequest } from "@/types/checkSession";
 import type { User } from "@/types/user";
 import type { Note } from "@/types/note";
 import { AxiosResponse } from "axios";
@@ -48,9 +48,9 @@ export async function fetchNoteById(id: string): Promise<Note> {
 }
 
 export async function checkSession(): Promise<
-  AxiosResponse<CheckSessionResponse>
+  AxiosResponse<CheckSessionRequest>
 > {
-  const response = await api.get<CheckSessionResponse>("/auth/session", {
+  const response = await api.get<CheckSessionRequest>("/auth/session", {
     headers: await getHeaders(),
   });
 
