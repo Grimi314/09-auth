@@ -67,4 +67,3 @@ export async function checkSession(): Promise<
 
   return response;
 }
-
