@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkSession } from "@/lib/api/serverApi";
+import { refreshSession } from "@/lib/api/serverApi";
 
 const PUBLIC_ROUTES = ["/sign-in", "/sign-up"];
 const PRIVATE_ROUTES = ["/notes", "/profile"];
@@ -18,40 +18,20 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  let newAccessToken = accessToken;
+  let currentAccess = accessToken;
 
 
   if (!accessToken && refreshToken) {
     try {
-      const response = await checkSession();
+      const response = await refreshSession();
 
       const {
         accessToken: newAccess,
         refreshToken: newRefresh,
       } = response.data;
 
-      newAccessToken = newAccess;
+      currentAccess = newAccess;
 
-      // 🔴 якщо публічний маршрут → редірект на /
-      if (isPublic) {
-        const redirectResponse = NextResponse.redirect(
-          new URL("/", request.url)
-        );
-
-        redirectResponse.cookies.set("accessToken", newAccess, {
-          httpOnly: true,
-          path: "/",
-        });
-
-        redirectResponse.cookies.set("refreshToken", newRefresh, {
-          httpOnly: true,
-          path: "/",
-        });
-
-        return redirectResponse;
-      }
-
-      // ✅ інакше просто next()
       const nextResponse = NextResponse.next();
 
       nextResponse.cookies.set("accessToken", newAccess, {
@@ -64,8 +44,12 @@ export async function proxy(request: NextRequest) {
         path: "/",
       });
 
+      if (isPublic) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+
       return nextResponse;
-    } catch (error) {
+    } catch {
       const response = NextResponse.redirect(
         new URL("/sign-in", request.url)
       );
@@ -77,23 +61,26 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // 🔒 Неавторизований → приватні сторінки заборонені
-  if (!newAccessToken && isPrivate) {
+  
+  if (!currentAccess && isPrivate) {
     return NextResponse.redirect(
       new URL("/sign-in", request.url)
     );
   }
 
-  // 🚫 Авторизований → не можна на sign-in / sign-up
-  if (newAccessToken && isPublic) {
-    return NextResponse.redirect(
-      new URL("/", request.url)
-    );
+
+  if (currentAccess && isPublic) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/notes/:path*", "/sign-in", "/sign-up"],
+  matcher: [
+    "/profile/:path*",
+    "/notes/:path*",
+    "/sign-in",
+    "/sign-up",
+  ],
 };

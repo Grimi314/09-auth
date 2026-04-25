@@ -66,6 +66,21 @@ export async function getMe(): Promise<User> {
 }
 
 
+import type { RefreshSessionResponse } from "@/types/checkSession";
+
+export async function refreshSession() {
+  const response = await api.post<RefreshSessionResponse>(
+    "/auth/refresh",
+    {},
+    {
+      withCredentials: true,
+    }
+  );
+
+  return response;
+}
+
+
 
 
 
