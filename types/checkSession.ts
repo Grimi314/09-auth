@@ -1,9 +1,4 @@
-export type CheckSessionRequest = {
-  success: boolean;
-};
-
-
-export interface RefreshSessionResponse {
+export interface CheckSessionResponse {
   accessToken: string;
   refreshToken: string;
 }

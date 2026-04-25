@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { refreshSession } from "@/lib/api/serverApi";
-
-
+import { checkSession } from "@/lib/api/serverApi";
 
 const PUBLIC_ROUTES = ["/sign-in", "/sign-up"];
-const PRIVATE_ROUTES =  ["/notes", "/profile"];;
+const PRIVATE_ROUTES = ["/notes", "/profile"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,37 +10,62 @@ export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
 
-const isPublic = PUBLIC_ROUTES.some((route) =>
+  const isPublic = PUBLIC_ROUTES.some((route) =>
     pathname.startsWith(route)
   );
 
   const isPrivate = PRIVATE_ROUTES.some((route) =>
     pathname.startsWith(route)
   );
+
   let newAccessToken = accessToken;
 
 
   if (!accessToken && refreshToken) {
     try {
-      const data = await refreshSession(refreshToken);
+      const response = await checkSession();
 
-      newAccessToken = data.accessToken;
+      const {
+        accessToken: newAccess,
+        refreshToken: newRefresh,
+      } = response.data;
 
-      const response = NextResponse.next();
+      newAccessToken = newAccess;
 
-      response.cookies.set("accessToken", data.accessToken, {
+      // 🔴 якщо публічний маршрут → редірект на /
+      if (isPublic) {
+        const redirectResponse = NextResponse.redirect(
+          new URL("/", request.url)
+        );
+
+        redirectResponse.cookies.set("accessToken", newAccess, {
+          httpOnly: true,
+          path: "/",
+        });
+
+        redirectResponse.cookies.set("refreshToken", newRefresh, {
+          httpOnly: true,
+          path: "/",
+        });
+
+        return redirectResponse;
+      }
+
+      // ✅ інакше просто next()
+      const nextResponse = NextResponse.next();
+
+      nextResponse.cookies.set("accessToken", newAccess, {
         httpOnly: true,
         path: "/",
       });
 
-      response.cookies.set("refreshToken", data.refreshToken, {
+      nextResponse.cookies.set("refreshToken", newRefresh, {
         httpOnly: true,
         path: "/",
       });
 
-      return response;
+      return nextResponse;
     } catch (error) {
-   
       const response = NextResponse.redirect(
         new URL("/sign-in", request.url)
       );
@@ -54,14 +77,14 @@ const isPublic = PUBLIC_ROUTES.some((route) =>
     }
   }
 
-
+  // 🔒 Неавторизований → приватні сторінки заборонені
   if (!newAccessToken && isPrivate) {
     return NextResponse.redirect(
       new URL("/sign-in", request.url)
     );
   }
 
-
+  // 🚫 Авторизований → не можна на sign-in / sign-up
   if (newAccessToken && isPublic) {
     return NextResponse.redirect(
       new URL("/", request.url)
@@ -72,5 +95,5 @@ const isPublic = PUBLIC_ROUTES.some((route) =>
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/notes/:path*", "/sign-in", "/sign-up"]
+  matcher: ["/profile/:path*", "/notes/:path*", "/sign-in", "/sign-up"],
 };

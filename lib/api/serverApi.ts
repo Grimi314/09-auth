@@ -1,11 +1,12 @@
 
 import { cookies } from "next/headers";
 import { api } from "./api";
-import type { CheckSessionRequest } from "@/types/checkSession";
+import type { CheckSessionResponse } from "@/types/checkSession";
 import type { User } from "@/types/user";
 import type { Note } from "@/types/note";
-import type { AxiosResponse } from "axios";
-import { RefreshSessionResponse } from "@/types/checkSession";
+import { AxiosResponse } from "axios";
+
+
 
 async function getHeaders() {
   const cookieStore = await cookies();
@@ -55,34 +56,15 @@ export async function getMe(): Promise<User> {
 }
 
 
+
+
 export async function checkSession(): Promise<
-  AxiosResponse<CheckSessionRequest>
+  AxiosResponse<CheckSessionResponse>
 > {
-  const response = await api.get<CheckSessionRequest>("/auth/session", {
+  const response = await api.get<CheckSessionResponse>("/auth/session", {
     headers: await getHeaders(),
   });
 
   return response;
 }
-
-export const refreshSession = async (
-  refreshToken: string
-): Promise<RefreshSessionResponse> => {
-  try {const res = await api.post<RefreshSessionResponse>(
-    "/auth/session",
-    { refreshToken }
-  );
-
-    return res.data;
-  }
-  catch (error) {
-  
-    if (error instanceof Error) {
-      throw new Error(`Failed to refresh session: ${error.message}`);
-    }
-    throw new Error("Failed to refresh session");
-  }
-}
-   
-
 
