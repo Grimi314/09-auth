@@ -3,8 +3,9 @@ import type { Note } from "../../types/note";
 import type { User, RegisterRequest } from "@/types/user";
 import type { LoginRequest } from "@/types/login";
 import type { CheckSessionRequest } from "@/types/checkSession";
-import { api } from "./api";
 import type { UserUpdate } from "@/types/user";
+import { api } from "./api";
+
 
 
 
