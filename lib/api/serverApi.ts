@@ -73,6 +73,7 @@ export async function refreshSession() {
     "/auth/refresh",
     {},
     {
+      headers: await getHeaders(),
       withCredentials: true,
     }
   );
