@@ -1,4 +1,4 @@
-export interface CheckSessionRequest {
+export interface CheckSessionResponse {
     success: boolean;
 }
 

@@ -2,7 +2,7 @@
 import type { Note } from "../../types/note";
 import type { User, RegisterRequest } from "@/types/user";
 import type { LoginRequest } from "@/types/login";
-import type { CheckSessionRequest } from "@/types/checkSession";
+import type { CheckSessionResponse } from "@/types/checkSession";
 import type { UserUpdate } from "@/types/user";
 import { api } from "./api";
 
@@ -36,20 +36,13 @@ export async function fetchNotes(searchText?: string, page?: number , perPage?: 
 }
 
 
-interface CreateNoteProps {
-  title: string ,
-  content: string ,
-  tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping'
-}
 
-export async  function createNote(newPost: CreateNoteProps): Promise<Note> {
-    const createNewNote = await api.post<Note> ("/notes", newPost,    {
-      headers: {
-     
-        accept: "application/json",
-      },
-    })
-    return createNewNote.data;
+
+export async function createNote(
+  payload: Pick<Note, "title" | "content" | "tag">,
+) {
+  const response = await api.post<Note>("/notes", payload);
+  return response.data;
 }
 
 export async function deleteNote(noteId : string, ) : Promise<Note> {
@@ -85,7 +78,7 @@ export async function logout(): Promise<void> {
 }
 
 export async function checkSession() {
-    const response = await api.get<CheckSessionRequest>('/auth/session');
+    const response = await api.get<CheckSessionResponse>('/auth/session');
     return response.data
 }
 
